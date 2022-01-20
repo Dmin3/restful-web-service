@@ -16,9 +16,10 @@ public class UserDaoService {
 
     //메모리 초기 설정
     static {
-        users.add(new User(1, "MIN", new Date()));
-        users.add(new User(2, "JIN", new Date()));
-        users.add(new User(3, "KI", new Date()));
+        users.add(new User(1, "MIN", new Date(), "pass1", "970819-1231231"));
+        users.add(new User(2, "MIN", new Date(), "pass2", "990817-1232345"));
+        users.add(new User(3, "MIN", new Date(), "pass3", "934561-1231221"));
+
     }
 
     public List<User> findAll(){
