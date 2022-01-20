@@ -1,11 +1,20 @@
 package com.example.restfulwebservice.user;
 
+
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
+
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -18,18 +27,38 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public List<User> retrieveFindAll(){
-        return service.findAll();
+    public ResponseEntity<CollectionModel<EntityModel<User>>> retrieveFindAll(){
+
+        List<EntityModel<User>> result = new ArrayList<>();
+        List<User> users = service.findAll();
+
+        for (User user : users) {
+            EntityModel entityModel = EntityModel.of(user);
+            entityModel.add(linkTo(methodOn(this.getClass()).retrieveFindAll()).withSelfRel());
+            result.add(entityModel);
+        }
+
+        return ResponseEntity
+                .ok(CollectionModel
+                        .of(result,linkTo(methodOn(this.getClass())
+                                .retrieveFindAll())
+                                .withSelfRel()));
     }
 
     // 예외 처리를 해보자
     @GetMapping("/users/{id}")
-    public User retrieveFindOne(@PathVariable int id){
+    public ResponseEntity<EntityModel<User>> retrieveFindOne(@PathVariable int id){
         User user = service.findOne(id);
         if (user == null){
             throw new UserNotFoundException(String.format("ID[%s] not found", id));
         }
-        return user;
+
+        //HATEOAS
+        EntityModel entityModel = EntityModel.of(user);
+        WebMvcLinkBuilder linkTo = linkTo(methodOn(this.getClass()).retrieveFindAll());
+        entityModel.add(linkTo.withRel("all-users"));
+        return ResponseEntity.ok(entityModel);
+
     }
 
 
