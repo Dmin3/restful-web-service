@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Configuration
-
 public class SwaggerConfig {
 
     private static final Contact DEFAULT_CONTANT = new Contact("Min JIN KI",
